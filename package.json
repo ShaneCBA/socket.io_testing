@@ -1,0 +1,15 @@
+{
+  "name": "learningsocket",
+  "version": "1.0.0",
+  "description": "Learn Socket.io",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"test\""
+  },
+  "author": "ShaneCBA",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.15.2",
+    "socket.io": "^1.7.3"
+  }
+}
