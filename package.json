@@ -4,7 +4,8 @@
   "description": "Learn Socket.io",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"test\""
+    "test": "echo \"test\"",
+    "start":"nodejs index.js"
   },
   "author": "ShaneCBA",
   "license": "ISC",

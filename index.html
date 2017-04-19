@@ -1,37 +1,80 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html>
-	<head>
+<head>
+	<title>Canvas Testing</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="./game.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-	<script>
-		$(function () {
-			var socket = io();
-			$('form').submit(function(){
-				socket.emit('chat message', $('#m').val());
-				$('#m').val('');
-				return false;
-			});
-			socket.on('chat message', function (msg){
-				$('#messages').append($('<li>').text(msg));
-			})
+	<style>
+		body {background-color:#22a4f3}
+		#canvas {background-color: #FFFFFF;display:block;margin:20px auto;box-shadow: 0px 2px 10px rgba(0,0,0,0.15);max-width:97%;max-height: 90vh;}
+		form {
+			display: block;
+			text-align: center;
+		}
+		form input , form button {
+			display: block;
+			margin: auto;
+			width: 97%;
+			max-width:1000px;
+			border:none;
+			text-align: center;
+			font-size: 20px;
+			border-bottom: 2px solid #CECECE;
+			padding:10px;
+			box-sizing: border-box;
+		}
+		form button {
+			background-color: #86d2ff;
+		}
+	</style>	
+</head>
+<body>
+<canvas id="canvas" width="1000" height="650"></canvas>
+<form acion="" id="join">
+	<input type="text" id="name" placeholder="Name" autocomplete="off">
+	<input type="text" id="color" placeholder="Color: Hex[FF00FF]">
+	<button>Confirm</button>
+</form>
+<form acion="" id="chat" style="display:none;">
+	<input type="text" id="chatMSG" placeholder="Chat Message" autocomplete="off">
+	<button>Send</button>
+</form>
+ </body>
+<script>
+	var keyState = {}; 
+	var socket = io();
+	var world = new World(document.getElementById("canvas"), socket, $('#name').val());
+
+	$(document).ready(function () {
+
+		$('#join').submit(function(e){
+			e.preventDefault(e);
+			world.start($('#name').val(),$('#color').val());
+			world.moved();
+			document.getElementById("chatMSG").addEventListener('keydown',function(e) { },true);
+			document.getElementById("chatMSG").addEventListener('keyup',function(e) { },true);
+			window.addEventListener('keydown',world.keyDown,true);
+			window.addEventListener('keyup',world.keyUp,true);
+			document.getElementById("canvas").addEventListener('touchstart', world.touchStart, false);
+			window.addEventListener('touchmove ', world.touchStart, false);
+			document.getElementById("canvas").addEventListener('touchend', world.touchEnd, false);
+			$('#join').remove();
+			$('#chat').show();
 		});
-	</script>
-		<title>Socket.IO chat</title>
-		<style>
-			* { margin: 0; padding: 0; box-sizing: border-box; }
-			body { font: 13px Helvetica, Arial; }
-			form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-			form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-			form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-			#messages { list-style-type: none; margin: 0; padding: 0; }
-			#messages li { padding: 5px 10px; }
-			#messages li:nth-child(odd) { background: #eee; }
-		</style>
-	</head>
-	<body>
-		<ul id="messages"></ul>
-		<form action="">
-			<input id="m" autocomplete="off" /><button>Send</button>
-		</form>
-	</body>
-</html>
+		$('#chat').submit(function(e){
+			e.preventDefault(e);
+			world.sendMsg($("#chatMSG").val());
+			//socket.emit('chat message', $("#chatMSG").val());
+			$("#chatMSG").val('');
+		});
+		socket.on('chat message', function (msg){
+			msg; 
+		})
+		socket.on('update players',world.updatePlayers);
+		socket.on('update player',world.updatePlayer);
+	});
+</script>
+ </html>

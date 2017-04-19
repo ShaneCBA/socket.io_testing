@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Canvas Testing</title>
+	<script src="./game.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+	<style>
+		body {background-color:#F0F0FF}
+		#canvas {background-color: #FFFFFF;display:block;margin:20px auto;box-shadow: 0px 2px 10px rgba(0,0,0,0.15);}
+	</style>	
+</head>
+<body>
+	<canvas id="canvas" width="800" height="450"></canvas>
+</body>
+<script src="./game.js"></script>
+<script type="text/javascript">
+</script>
+<script>
+	$(function () {
+		var socket = io();
+ 		var game = new World(document.getElementById("canvas").getContext("2d"), socket);
+		$('form').submit(function(){
+			socket.emit('chat message', $('#m').val());
+			$('#m').val('');
+			return false;
+		});
+		socket.on('chat message', function (msg){
+			msg.id;
+		})
+	});
+</script>
+ </html>
