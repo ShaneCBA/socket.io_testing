@@ -108,16 +108,13 @@ class World {
 		this.ctx.clearRect(0,0,canvas.width,canvas.height);
 		this.sortPlayers();
 		this.drawPlayers();
-		//ahis.client.draw(this.ctx);
 	}
 
 	drawPlayers(){
 		for ( var key in self.players) {
-			//if (key != this.socket.id){
-				var plr = new Player(self.players[key].x,self.players[key].y,self.players[key].name, self.players[key].color);
-				plr.msg = (self.players[key].msg != undefined)?self.players[key].msg:undefined;
-				plr.draw(this.ctx);
-			//}
+			var plr = new Player(self.players[key].x,self.players[key].y,self.players[key].name, self.players[key].color);
+			plr.msg = (self.players[key].msg != undefined)?self.players[key].msg:undefined;
+			plr.draw(this.ctx);
 		}
 	}
 
@@ -159,8 +156,8 @@ class World {
 		this.client.msg = {content:msg,time:(new Date()).getTime()};
 		debug("Message Sent");
 	}
-	setMap(){
-
+	newChat(chat){
+		self.players[chat.id].msg = {content:chat.content,time:(new Date()).getTime()};
 	}
 }
 

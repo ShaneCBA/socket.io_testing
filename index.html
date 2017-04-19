@@ -73,8 +73,8 @@
 		socket.on('chat message', function (msg){
 			msg; 
 		})
-		socket.on('update players',world.updatePlayers);
 		socket.on('update player',world.updatePlayer);
+		socket.on('player chat',world.newChat);
 	});
 </script>
  </html>
