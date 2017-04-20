@@ -52,7 +52,8 @@
 
 		$('#join').submit(function(e){
 			e.preventDefault(e);
-			world.start($('#name').val(),$('#color').val());
+			console.log(location.hash.substring(1));
+			world.start($('#name').val(),$('#color').val(),parseInt(location.hash.substring(1)));
 			world.moved();
 			document.getElementById("chatMSG").addEventListener('keydown',function(e) { },true);
 			document.getElementById("chatMSG").addEventListener('keyup',function(e) { },true);
@@ -67,14 +68,15 @@
 		$('#chat').submit(function(e){
 			e.preventDefault(e);
 			world.sendMsg($("#chatMSG").val());
-			//socket.emit('chat message', $("#chatMSG").val());
-			$("#chatMSG").val('');
+			$("#chatMSG").val("");
 		});
 		socket.on('chat message', function (msg){
 			msg; 
 		})
 		socket.on('update player',world.updatePlayer);
 		socket.on('player chat',world.newChat);
+		//socket.on('retrieve',function(){ console.log("recieved"); });
+		socket.on('retrieve', world.moved);
 	});
 </script>
  </html>

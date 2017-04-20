@@ -1,5 +1,4 @@
 // index.js
-
 var app = require('express')();
 var fs = require('fs');
 var https = require('https');
@@ -45,20 +44,20 @@ app.get('/pegnin.svg', function (req, res) {
 });
 
 
-
+var rooms = ['hub','nope'];
 io.on('connection', function (socket) {
-	//Usefull !! 
 	console.log('User connected');
 	socket.player = {};
-	
+
 	socket.on('disconnect', function () {
-		io.emit('update player',{id:socket.id,dead:true});
+		io.to(socket.room).emit('update player',{id:socket.id,dead:true});
 		console.log('User disconnect');
 	});
+
 	socket.on('chat message', function (message) {
 		console.log('[MSG] :: '+message);
 
-		io.emit('player chat', {id:socket.id,content:message});
+		io.to(socket.room).emit('player chat', {id:socket.id,content:message});
 	});
 
 	socket.on('move player', function (move) {
@@ -69,6 +68,22 @@ io.on('connection', function (socket) {
 		socket.player.id = socket.id;
 
 		if (socket.player.msg != undefined && (new Date()).getTime() - socket.player.msg.time > 5000) socket.player.msg = undefined;
-		socket.broadcast.emit('update player',socket.player);
+
+		socket.broadcast.to(socket.room).emit('update player',socket.player);
+		
+		socket.emit('update player',socket.player);
 	});
+	socket.on('get players', function () {
+	})
+
+	socket.on('join room', function (id) {
+		if (socket.room != undefined) socket.leave(socket.room);
+		socket.room = rooms[id];
+		socket.join(rooms[id]);
+		io.to(socket.room).emit('retrieve');
+		
+		for (var clnt in io.sockets.adapter.rooms['hub'].sockets){
+			socket.emit('update player',io.of('/').in('hub').connected[clnt].player);
+		}
+	})
 });

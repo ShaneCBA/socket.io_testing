@@ -1,4 +1,6 @@
 
+var doDebug = true;
+
 class World {
 	constructor(canvas, socket){
 		this.canvas = canvas;
@@ -57,7 +59,8 @@ class World {
 		keyState[68] = false;
 	}
 
-	start(name, color){
+	start(name, color, room){
+		room = (room || 0);
 		var self = this;
 		if (color.match('[a-fA-F0-9]{6}') == undefined){
 			color = "";
@@ -68,6 +71,8 @@ class World {
 		setInterval(function(){
 			self.update();
 		}, 1);
+		this.socket.emit('join room', room);
+		this.socket.emit('get players', room);
 	}
 
 	update(){
@@ -101,7 +106,8 @@ class World {
 	}
 
 	moved(){
-		this.socket.emit('move player',{x:this.client.x,y:this.client.y,name:this.client.name,color:this.client.color});
+		console.log(this.client);
+		self.socket.emit('move player',{x:this.client.x,y:this.client.y,name:this.client.name,color:this.client.color});
 	}
 
 	draw(){
@@ -124,9 +130,15 @@ class World {
 
 	updatePlayer(player){//FMT: {id:((ID)),x,y,etc};
 		var id = player.id;
+		if (self.players[id] == undefined){
+			self.players[id] = {};
+		}
 		if (!player.dead){
 			delete player.id;
-			self.players[id] = player;
+			self.players[id].x = player.x;
+			self.players[id].y = player.y;
+			self.players[id].color = player.color;
+			self.players[id].name = player.name;
 		}
 		else {
 			delete self.players[id];
@@ -135,10 +147,10 @@ class World {
 
 	sortPlayers(){
 		var indexArray = [];
-		//indexArray = Object.keys(this.players);
 		var i;
 		var newObj = {};
 		this.players[this.socket.id] = {x:this.client.x,y:this.client.y,name:this.client.name,color:this.client.color,msg:this.client.msg};
+		//indexArray = Object.keys(this.players);
 		for (i in self.players){
 			indexArray.push(i);
 		}
