@@ -1,5 +1,5 @@
 
-var doDebug = true;
+var doDebug = false;
 
 class World {
 	constructor(canvas, socket){
@@ -9,6 +9,30 @@ class World {
 		this.players = {};
 		this.keyState = {};
 		this.socket = socket;
+		this.mapObjs = [];
+		this.keyUp.bind(this);
+		this.keyDown.bind(this);
+		this.touchStart.bind(this);
+		this.update.bind(this);
+		this.start.bind(this);
+		this.moved.bind(this);
+		this.draw.bind(this);
+		this.drawPlayers.bind(this);
+		this.updateMap.bind(this);
+		this.drawMap.bind(this);
+		this.updatePlayer.bind(this);
+		this.joinRoom.bind(this);
+		this.actions = {
+			room:function (room) {
+				this.joinRoom(room);
+				this.players = {};
+			}.bind(this)
+		};
+		this.conditions = {
+			collide:function(obj1, obj2){
+				return (((obj1.x < obj2.x + obj2.w) && (obj1.x + obj1.w > obj2.x + obj2.w)) || ((obj1.x + obj1.w > obj2.x) && (obj1.x < obj2.x))) && (((obj1.y < obj2.y + obj2.h) && (obj1.y + obj1.h > obj2.y + obj2.h)) || ((obj1.y + obj1.h > obj2.y) && (obj1.y < obj2.y)))
+			}
+		}
 	}
 
 	keyUp(e){
@@ -61,7 +85,6 @@ class World {
 
 	start(name, color, room){
 		room = (room || 0);
-		var self = this;
 		if (color.match('[a-fA-F0-9]{6}') == undefined){
 			color = "";
 			let c = (Math.random()).toString(16);
@@ -69,79 +92,88 @@ class World {
 		}
 		this.client = new Player(50,50,name, color);
 		setInterval(function(){
-			self.update();
-		}, 1);
-		this.socket.emit('join room', room);
-		this.socket.emit('get players', room);
+			this.update();
+		}.bind(this), 1);
+		setTimeout(function(){this.socket.emit('join room', 0);}.bind(this),1000);
+		
 	}
 
 	update(){
-		if (keyState[87] && (keyState[65] || keyState[68]) ){
-			if (keyState[65]){
+		if (this.keyState[87] && (this.keyState[65] || this.keyState[68]) ){
+			if (this.keyState[65]){
 				this.client.moveX(-0.5);
 				this.client.moveY(-0.5);
 			}
-			if (keyState[68]){
+			if (this.keyState[68]){
 				this.client.moveX(0.5);
 				this.client.moveY(-0.5);
 			}
 		}
-		else if (keyState[83] && (keyState[65] || keyState[68]) ){
-			if (keyState[65]){
+		else if (this.keyState[83] && (this.keyState[65] || this.keyState[68]) ){
+			if (this.keyState[65]){
 				this.client.moveX(-0.5);
 				this.client.moveY(0.5);
 			}
-			if (keyState[68]){
+			if (this.keyState[68]){
 				this.client.moveX(0.5);
 				this.client.moveY(0.5);
 			}}
-		else if (keyState[87]){this.client.moveY(-1)}//up
-		else if (keyState[83]){this.client.moveY(1)}//down
-		else if (keyState[65]){this.client.moveX(-1)}//left
-		else if (keyState[68]){this.client.moveX(1)}//right
-		if (keyState[87] || keyState[83] || keyState[65] || keyState[68]){
+		else if (this.keyState[87]){this.client.moveY(-1)}//up
+		else if (this.keyState[83]){this.client.moveY(1)}//down
+		else if (this.keyState[65]){this.client.moveX(-1)}//left
+		else if (this.keyState[68]){this.client.moveX(1)}//right
+		if (this.keyState[87] || this.keyState[83] || this.keyState[65] || this.keyState[68]){
 			this.moved();
 		}
 		this.draw();
 	}
 
 	moved(){
-		console.log(this.client);
-		self.socket.emit('move player',{x:this.client.x,y:this.client.y,name:this.client.name,color:this.client.color});
+		this.socket.emit('move player',{x:this.client.x,y:this.client.y,name:this.client.name,color:this.client.color});
+		debug(this.players);
 	}
 
 	draw(){
 		this.ctx.clearRect(0,0,canvas.width,canvas.height);
-		this.sortPlayers();
+		//this.sortPlayers();
 		this.drawPlayers();
+		this.drawMap();
 	}
 
 	drawPlayers(){
-		for ( var key in self.players) {
-			var plr = new Player(self.players[key].x,self.players[key].y,self.players[key].name, self.players[key].color);
-			plr.msg = (self.players[key].msg != undefined)?self.players[key].msg:undefined;
+		for ( var key in this.players) {
+			var plr = new Player(this.players[key].x,this.players[key].y,this.players[key].name, this.players[key].color);
+			plr.msg = (this.players[key].msg != undefined)?this.players[key].msg:undefined;
 			plr.draw(this.ctx);
 		}
 	}
-
-	updatePlayers(players){// TOBE REPLACED
-		self.players = players;
+	drawMap(){
+		if (this.mapObjs.length > 0){
+			this.mapObjs.forEach(function(object){
+				try{if (this.conditions[object.condition](object, this.client)) {this.actions[object.action](object.room);delete this.client.msg}}catch(e) {}
+				var obj = new GameObject(object.x,object.y,object.w,object.h,object.src);
+				obj.draw(this.ctx);
+			}.bind(this));
+		}
 	}
 
 	updatePlayer(player){//FMT: {id:((ID)),x,y,etc};
 		var id = player.id;
-		if (self.players[id] == undefined){
-			self.players[id] = {};
+		console.log("doot");
+		if ('undefined' === typeof this.players[id]){
+			this.players[id] = {};
+			console.log(id+"is added");
 		}
 		if (!player.dead){
 			delete player.id;
-			self.players[id].x = player.x;
-			self.players[id].y = player.y;
-			self.players[id].color = player.color;
-			self.players[id].name = player.name;
+			this.players[id].x = player.x;
+			this.players[id].y = player.y;
+			this.players[id].color = player.color;
+			this.players[id].name = player.name;
 		}
 		else {
-			delete self.players[id];
+			delete this.players[id];
+			console.log(id+" is disconnected");
 		}
 	}
 
@@ -151,16 +183,17 @@ class World {
 		var newObj = {};
 		this.players[this.socket.id] = {x:this.client.x,y:this.client.y,name:this.client.name,color:this.client.color,msg:this.client.msg};
 		//indexArray = Object.keys(this.players);
-		for (i in self.players){
+		for (i in this.players){
 			indexArray.push(i);
 		}
 		indexArray.sort(function(a,b){
-			return (self.players[a].y < self.players[b].y)?-1:1;
-		});
+			return (this.players[a].y < this.players[b].y)?-1:1;
+		}.bind(this));
 		for (let n = 0; n < indexArray.length; n++){
-			newObj[indexArray[n]] = self.players[indexArray[n]];
+			newObj[indexArray[n]] = this.players[indexArray[n]];
 		}
-		self.players = newObj;
+		if (this.players != {})
+			this.players = newObj;
 
 	}
 	sendMsg(msg){
@@ -169,7 +202,18 @@ class World {
 		debug("Message Sent");
 	}
 	newChat(chat){
-		self.players[chat.id].msg = {content:chat.content,time:(new Date()).getTime()};
+		this.players[chat.id].msg = {content:chat.content,time:(new Date()).getTime()};
+	}
+
+	updateMap(map){
+		this.mapObjs = map.objects;
+		debug(this.mapObjs);
+		this.canvas.style.background = (map.background || "#FFFFFF");
+	}
+
+	joinRoom(room){
+		this.socket.emit('join room', room);
+		this.players = {};
 	}
 }
 
@@ -180,14 +224,14 @@ class GameObject {
 	constructor(x,y,w,h,src){
 		this.x = x;
 		this.y = y;
-		this.width = w;
-		this.height = h;
+		this.w = w;
+		this.h = h;
 		this.img = new Image();
 		this.img.src = src;
 	}
 
 	draw(ctx){
-		 ctx.drawImage(this.img,this.x,this.y, this.width, this.height);
+		 ctx.drawImage(this.img,this.x,this.y, this.w, this.h);
 	}
 
 	setXY(x,y){
@@ -206,7 +250,7 @@ class GameObject {
 
 class Player extends GameObject {
 	constructor(x,y,name,color) {
-		super(x,y,120,120,"./pegnin.svg?color="+color);
+		super(x,y,70,70,"./pegnin.svg?color="+color);
 		this.color = color;
 		this.name = name;
 	}
@@ -217,8 +261,8 @@ class Player extends GameObject {
 		ctx.strokeStyle = "white";
 		ctx.lineWidth = 1;
 		ctx.textAlign="center"; 
-		ctx.fillText(this.name, this.x+this.width/2,this.y-10);
-		ctx.strokeText(this.name, this.x+this.width/2,this.y-10);
+		ctx.fillText(this.name, this.x+this.w/2,this.y-10);
+		ctx.strokeText(this.name, this.x+this.w/2,this.y-10);
 		if (this.msg != undefined){
 			if((new Date()).getTime() - this.msg.time < 5000){
 				ctx.font = "20px Arial";
@@ -230,15 +274,15 @@ class Player extends GameObject {
 				ctx.strokeStyle = "transparent";
 				let width = ctx.measureText(this.msg.content).width;
 				let padding = 10;
-				ctx.fillRect((this.x+this.width/2)-(width/2+padding),this.y-50-padding-20+5,(width+padding*2),20+padding*2-5);
+				ctx.fillRect((this.x+this.w/2)-(width/2+padding),this.y-50-padding-20+5,(width+padding*2),20+padding*2-5);
 
 				ctx.shadowBlur=0;
 				ctx.shadowOffsetY=0;
 				ctx.shadowColor="transparent";
 				ctx.fillStyle = "#000000";
 				ctx.textAlign="center"; 
-				ctx.fillText(this.msg.content, this.x+this.width/2,this.y-50);
-				ctx.strokeText(this.msg.content, this.x+this.width/2,this.y-50);
+				ctx.fillText(this.msg.content, this.x+this.w/2,this.y-50);
+				ctx.strokeText(this.msg.content, this.x+this.w/2,this.y-50);
 			}
 			else {this.msg = undefined;}
 		}

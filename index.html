@@ -55,10 +55,12 @@
 			console.log(location.hash.substring(1));
 			world.start($('#name').val(),$('#color').val(),parseInt(location.hash.substring(1)));
 			world.moved();
-			document.getElementById("chatMSG").addEventListener('keydown',function(e) { },true);
-			document.getElementById("chatMSG").addEventListener('keyup',function(e) { },true);
-			window.addEventListener('keydown',world.keyDown,true);
-			window.addEventListener('keyup',world.keyUp,true);
+			//window.addEventListener('keydown',world.keyDown,true);
+			//window.addEventListener('keyup',world.keyUp,true);
+
+			window.addEventListener('keydown',function(e){if (document.activeElement.tagName != "INPUT")world.keyDown(e);else console.log("nope");},true);
+			window.addEventListener('keyup',function(e){if (document.activeElement.tagName != "INPUT")world.keyUp(e);else console.log("nope");},true);
+
 			document.getElementById("canvas").addEventListener('touchstart', world.touchStart, false);
 			window.addEventListener('touchmove ', world.touchStart, false);
 			document.getElementById("canvas").addEventListener('touchend', world.touchEnd, false);
@@ -70,13 +72,11 @@
 			world.sendMsg($("#chatMSG").val());
 			$("#chatMSG").val("");
 		});
-		socket.on('chat message', function (msg){
-			msg; 
-		})
-		socket.on('update player',world.updatePlayer);
-		socket.on('player chat',world.newChat);
+		socket.on('update player',world.updatePlayer.bind(world));
+		socket.on('player chat',world.newChat.bind(world));
 		//socket.on('retrieve',function(){ console.log("recieved"); });
-		socket.on('retrieve', world.moved);
+		socket.on('retrieve', world.moved.bind(world));
+		socket.on('update map',world.updateMap.bind(world))
 	});
 </script>
  </html>

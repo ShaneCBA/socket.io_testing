@@ -20,6 +20,10 @@ app.get('/', function (req, res) {
 app.get('/game.js', function (req, res) {
 	res.sendFile(__dirname + '/game.js');
 });
+app.get('/ytdl', function(req, res){
+	res.writeHead(200, {'Content-Type':'text/html'});
+	res.sendFile(__dirname + '/index.html');
+});
 app.get('/pegnin.svg', function (req, res) {
 	fs.readFile('./pegnin.svg', 'utf8', function(err, data) {
 		if (err){
@@ -42,9 +46,20 @@ app.get('/pegnin.svg', function (req, res) {
 		//res.sendFile(__dirname + '/pegnin.svg');
 	});
 });
+app.get('/portal.svg', function (req, res) {
+	res.sendFile(__dirname + '/portal.svg');
+});
 
 
-var rooms = ['hub','nope'];
+
+var rooms = [];
+rooms.push({room:'hub',objects:[
+	{x:200,y:200,w:75,h:75,src:"./portal.svg",action:'room',condition:'collide',room:1}
+]});
+rooms.push({room:'nope',background:"url(https://i.imgur.com/RbaEhHA.jpg) center/cover no-repeat",objects:[
+	{x:0,y:100,w:75,h:75,src:"./portal.svg",action:'room',condition:'collide',room:0}
+]});
+
 io.on('connection', function (socket) {
 	console.log('User connected');
 	socket.player = {};
@@ -66,6 +81,7 @@ io.on('connection', function (socket) {
 		socket.player.name = move.name;
 		socket.player.color = move.color;
 		socket.player.id = socket.id;
+		//console.log(socket.id+" >> "+Object.keys(socket.rooms)+"\n\n");
 
 		if (socket.player.msg != undefined && (new Date()).getTime() - socket.player.msg.time > 5000) socket.player.msg = undefined;
 
@@ -73,17 +89,36 @@ io.on('connection', function (socket) {
 		
 		socket.emit('update player',socket.player);
 	});
-	socket.on('get players', function () {
-	})
 
 	socket.on('join room', function (id) {
 		if (socket.room != undefined) socket.leave(socket.room);
-		socket.room = rooms[id];
-		socket.join(rooms[id]);
-		io.to(socket.room).emit('retrieve');
-		
-		for (var clnt in io.sockets.adapter.rooms['hub'].sockets){
-			socket.emit('update player',io.of('/').in('hub').connected[clnt].player);
+		socket.broadcast.to(socket.room).emit('update player',{id:socket.id,dead:true});
+
+		socket.room = rooms[id].room;
+		console.log("\n{");
+		socket.join(rooms[id].room);console.log(rooms[id].room);
+		socket.join(rooms[id].room);console.log(socket.rooms);
+		socket.rooms[""+socket.room+""] = socket.room;
+		console.log("}\n");
+		io.emit('player chat',{id:socket.id,content:Object.keys(socket.rooms),time:(new Date()).getTime()})
+
+		socket.emit('update map', rooms[id]);
+
+		socket.broadcast.to(socket.room).emit('update player', socket.player);
+	})
+	socket.on('get players', function (){
+		try
+		{
+			plrs = io.sockets.sockets;
+			plrKeys = Object.keys(plrs);
+			console.log(plrKeys);
+			for (var x = 0; x < plrKeys.length; x++){
+				if (plrs[plrKeys[x]].rooms[socket.room]) socket.emit('update player',plrs[plrKeys[x]].player);
+			}
+		}
+		catch(e)
+		{
+			console.log(e);
 		}
 	})
 });

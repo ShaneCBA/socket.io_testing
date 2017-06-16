@@ -7,13 +7,13 @@
 6 silly lifecycle learningsocket@1.0.0~prestart: no script for prestart, continuing
 7 info lifecycle learningsocket@1.0.0~start: learningsocket@1.0.0
 8 verbose lifecycle learningsocket@1.0.0~start: unsafe-perm in lifecycle true
-9 verbose lifecycle learningsocket@1.0.0~start: PATH: /usr/lib/node_modules/npm/bin/node-gyp-bin:/root/nodeProjects/socket/node_modules/.bin:/root/.sdkman/candidates/gradle/current/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/mnt/c/Users/shane/Desktop/Program Files/ConEMU/ConEmu/Scripts:/mnt/c/Users/shane/Desktop/Program Files/ConEMU:/mnt/c/Users/shane/Desktop/Program Files/ConEMU/ConEmu:/mnt/c/ProgramData/Oracle/Java/javapath_target_21115359:/mnt/c/Windows/System32:/mnt/c/Windows:/mnt/c/Windows/System32/wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0:/mnt/c/Users/shane/.dnx/bin:/mnt/c/Program Files/Microsoft DNX/Dnvm:/mnt/c/Program Files (x86)/Windows Kits/8.1/Windows Performance Toolkit:/mnt/c/Program Files (x86)/OpenSSH/bin:/mnt/c/Program Files/Common Files/Autodesk Shared:/mnt/c/Program Files/OpenVPN/bin:/mnt/c/Program Files (x86)/Skype/Phone:/mnt/c/Program Files/TortoiseSVN/bin:/mnt/c/Program Files (x86)/nodejs:/mnt/c/Users/shane/AppData/Local/Enthought/Canopy/User/Scripts:/mnt/c/Users/shane/AppData/Local/Enthought/Canopy/User:/mnt/c/Users/shane/AppData/Local/Enthought/Canopy/User/Scripts:/mnt/c/Users/shane/.lein/bin:/mnt/c/Users/shane/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/shane/AppData/Roaming/npm:/mnt/c/adb:/mnt/c/Windows/System32:/mnt/c/Windows:/mnt/c/Windows/System32/wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0:/mnt/c/ProgramData/Chocolatey/bin:/mnt/c/ProgramData/Chocolatey/lib/gradle/tools/gradle-3.1/bin:/mnt/c/Users/shane/AppData/Local/Enthought/Canopy/User/Scripts:/mnt/c/Users/shane/AppData/Local/Enthought/Canopy/User:/mnt/c/Users/shane/AppData/Local/Enthought/Canopy/User/Scripts:/mnt/c/Users/shane/.lein/bin:/mnt/c/Users/shane/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/shane/AppData/Roaming/npm
+9 verbose lifecycle learningsocket@1.0.0~start: PATH: /usr/lib/node_modules/npm/bin/node-gyp-bin:/root/nodeProjects/socket/node_modules/.bin:/root/.sdkman/candidates/gradle/current/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/mnt/c/ProgramData/Oracle/Java/javapath_target_21115359:/mnt/c/Windows/System32:/mnt/c/Windows:/mnt/c/Windows/System32/wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0:/mnt/c/Users/shane/.dnx/bin:/mnt/c/Program Files/Microsoft DNX/Dnvm:/mnt/c/Program Files (x86)/Windows Kits/8.1/Windows Performance Toolkit:/mnt/c/Program Files (x86)/OpenSSH/bin:/mnt/c/Program Files/Common Files/Autodesk Shared:/mnt/c/Program Files/OpenVPN/bin:/mnt/c/Program Files (x86)/Skype/Phone:/mnt/c/Program Files/TortoiseSVN/bin:/mnt/c/Program Files (x86)/nodejs:/mnt/c/Users/shane/AppData/Local/Enthought/Canopy/User/Scripts:/mnt/c/Users/shane/AppData/Local/Enthought/Canopy/User:/mnt/c/Users/shane/AppData/Local/Enthought/Canopy/User/Scripts:/mnt/c/Users/shane/.lein/bin:/mnt/c/Users/shane/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/shane/AppData/Roaming/npm:/mnt/c/adb:/mnt/c/Windows/System32:/mnt/c/Windows:/mnt/c/Windows/System32/wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0:/mnt/c/ProgramData/Chocolatey/bin:/mnt/c/ProgramData/Chocolatey/lib/gradle/tools/gradle-3.1/bin:/mnt/c/Users/shane/AppData/Local/Enthought/Canopy/User/Scripts:/mnt/c/Users/shane/AppData/Local/Enthought/Canopy/User:/mnt/c/Users/shane/AppData/Local/Enthought/Canopy/User/Scripts:/mnt/c/Users/shane/.lein/bin:/mnt/c/Users/shane/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/shane/AppData/Roaming/npm
 10 verbose lifecycle learningsocket@1.0.0~start: CWD: /root/nodeProjects/socket
 11 silly lifecycle learningsocket@1.0.0~start: Args: [ '-c', 'nodejs index.js' ]
-12 silly lifecycle learningsocket@1.0.0~start: Returned: code: 1  signal: null
+12 silly lifecycle learningsocket@1.0.0~start: Returned: code: 143  signal: null
 13 info lifecycle learningsocket@1.0.0~start: Failed to exec start script
 14 verbose stack Error: learningsocket@1.0.0 start: `nodejs index.js`
-14 verbose stack Exit status 1
+14 verbose stack Exit status 143
 14 verbose stack     at EventEmitter.<anonymous> (/usr/lib/node_modules/npm/lib/utils/lifecycle.js:255:16)
 14 verbose stack     at emitTwo (events.js:106:13)
 14 verbose stack     at EventEmitter.emit (events.js:191:7)
@@ -30,7 +30,7 @@
 20 error npm  v3.10.10
 21 error code ELIFECYCLE
 22 error learningsocket@1.0.0 start: `nodejs index.js`
-22 error Exit status 1
+22 error Exit status 143
 23 error Failed at the learningsocket@1.0.0 start script 'nodejs index.js'.
 23 error Make sure you have the latest version of node.js and npm installed.
 23 error If you do, this is most likely a problem with the learningsocket package,
